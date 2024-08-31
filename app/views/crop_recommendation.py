@@ -9,7 +9,7 @@ from Skitech_FarmFit_Backend.settings import BASE_DIR
 
 
 def crop_classifier():
-    model_path = os.path.join(BASE_DIR, 'utils/models/RandomForest.pkl')
+    model_path = os.path.join(BASE_DIR, 'app/utils/models/RandomForest.pkl')
     crop_recommendation_model = pickle.load(open(model_path, 'rb'))
     return crop_recommendation_model
 
