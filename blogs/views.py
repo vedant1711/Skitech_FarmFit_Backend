@@ -1,11 +1,16 @@
 # Create your views here.
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from blogs.models import BlogEntry
-from blogs.serializers import BlogEntrySerializer
+from blogs.models import BlogEntry, CustomUser
+from blogs.serializers import BlogEntrySerializer, CustomUserSerializer
 from rest_framework import viewsets, status
 from django.utils.text import slugify
 from rest_framework.exceptions import NotFound
+
+
+class CustomUserViewSet (viewsets.ModelViewSet):
+    queryset = CustomUser.objects.all()
+    serializer_class = CustomUserSerializer
 
 
 class BlogEntryViewSet(viewsets.ModelViewSet):
