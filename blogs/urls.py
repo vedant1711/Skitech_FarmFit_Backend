@@ -1,9 +1,9 @@
 from django.urls import path, include
-from blogs.views import BlogEntryViewSet
 from rest_framework.routers import DefaultRouter
+from blogs.views import BlogEntryViewSet
 
 router = DefaultRouter()
-router.register('blogs', BlogEntryViewSet, basename='blogs')
+router.register(r'', BlogEntryViewSet, basename='blogentry')
 
 urlpatterns = [
     path('', include(router.urls)),
