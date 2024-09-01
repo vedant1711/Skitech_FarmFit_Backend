@@ -7,8 +7,8 @@ class BlogEntryAdmin (admin.ModelAdmin):
 
 
 class CustomUserAdmin(admin.ModelAdmin):
-    list_display = ('phone_number', 'first_name', 'last_name', 'is_expert')
-    search_fields = ('phone_number', 'first_name', 'last_name')
+    list_display = ('id', 'phone_number', 'first_name', 'last_name', 'is_expert')
+    search_fields = ('id', 'phone_number', 'first_name', 'last_name')
 
 
 # Register your models here.
