@@ -40,7 +40,7 @@ class FertilizerCombinationAPIView(APIView):
                 combination_details[fert_name] = round(amount * farm_area, 3)
             response_data.append(combination_details)
 
-        return Response(response_data)
+        return Response(response_data[:5])
 
 
 def categorize_fertilizers(fertilizers):
