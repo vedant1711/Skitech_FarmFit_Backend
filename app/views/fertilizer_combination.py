@@ -9,13 +9,15 @@ class FertilizerCombinationAPIView(APIView):
     def post(self, request):
         crop_name = request.data.get('crop_name')
         farm_area = request.data.get('farm_area')
-        soil_npk = request.data.get('soil_npk', [0, 0, 0])  # Defaults to 0 if not provided
+        soil_n = request.data.get('n',0)
+        soil_p = request.data.get('p',0)
+        soil_k = request.data.get('k',0)
 
         crop_requirement = get_object_or_404(CropNutrientRequirement, crop_name=crop_name)
 
-        net_n = max(crop_requirement.nitrogen_needed - soil_npk[0], 0)
-        net_p = max(crop_requirement.phosphorus_needed - soil_npk[1], 0)
-        net_k = max(crop_requirement.potassium_needed - soil_npk[2], 0)
+        net_n = max(crop_requirement.nitrogen_needed - soil_n, 0)
+        net_p = max(crop_requirement.phosphorus_needed - soil_p, 0)
+        net_k = max(crop_requirement.potassium_needed - soil_k, 0)
         remaining_requirements = [net_n, net_p, net_k]
 
         if net_n == 0 and net_p == 0 and net_k == 0:
