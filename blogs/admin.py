@@ -6,8 +6,9 @@ class BlogEntryAdmin (admin.ModelAdmin):
     list_display = [field.name for field in BlogEntry._meta.fields]
 
 
-class CustomUserAdmin (admin.ModelAdmin):
-    list_display = [field.name for field in CustomUser._meta.fields]
+class CustomUserAdmin(admin.ModelAdmin):
+    list_display = ('phone_number', 'first_name', 'last_name', 'is_expert')
+    search_fields = ('phone_number', 'first_name', 'last_name')
 
 
 # Register your models here.
