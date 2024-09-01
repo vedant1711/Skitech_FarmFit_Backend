@@ -6,7 +6,11 @@ import os
 import pickle
 import pandas as pd
 from Skitech_FarmFit_Backend.settings import BASE_DIR
+from statistics import mean
+from dotenv import load_dotenv
 
+
+load_dotenv()
 
 def crop_classifier():
     model_path = os.path.join(BASE_DIR, 'app/utils/models/RandomForest.pkl')
