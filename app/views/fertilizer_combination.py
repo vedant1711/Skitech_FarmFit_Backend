@@ -9,9 +9,9 @@ class FertilizerCombinationAPIView(APIView):
     def post(self, request):
         crop_name = request.data.get('crop_name')
         farm_area = request.data.get('farm_area')
-        soil_n = request.data.get('n',0)
-        soil_p = request.data.get('p',0)
-        soil_k = request.data.get('k',0)
+        soil_n = request.data.get('n', 0)
+        soil_p = request.data.get('p', 0)
+        soil_k = request.data.get('k', 0)
 
         crop_requirement = get_object_or_404(CropNutrientRequirement, crop_name=crop_name)
 
@@ -30,15 +30,16 @@ class FertilizerCombinationAPIView(APIView):
         categorized_fertilizers = categorize_fertilizers(fertilizer_dict)
 
         # Generate valid fertilizer combinations
-        valid_combinations = generate_combinations(categorized_fertilizers, remaining_requirements)
+        valid_combinations = generate_combinations(categorized_fertilizers, farm_area, remaining_requirements)
 
         # Prepare the response
         response_data = []
         for combination in valid_combinations:
-            combination_details = {}
-            for fert_name, amount in combination.items():
-                combination_details[fert_name] = round(amount * farm_area, 3)
-            response_data.append(combination_details)
+            combination_details = {fert_name: round(amount * farm_area, 3)
+                                   for fert_name, amount in combination.items()
+                                   if round(amount * farm_area, 3) > 0}
+            if combination_details:  # Only add non-empty combinations
+                response_data.append(combination_details)
 
         return Response(response_data[:5])
 
@@ -72,7 +73,7 @@ def categorize_fertilizers(fertilizers):
     return npk_fertilizers, np_fertilizers, nk_fertilizers, pk_fertilizers, n_fertilizers, p_fertilizers, k_fertilizers
 
 
-def generate_combinations(fertilizer_groups, remaining_requirements):
+def generate_combinations(fertilizer_groups, farm_area, remaining_requirements):
     possible_combinations = []
 
     for r in range(1, len(fertilizer_groups) + 1):
@@ -90,10 +91,15 @@ def generate_combinations(fertilizer_groups, remaining_requirements):
                     else:
                         combined_fert[fert_name] = amount_needed
 
-            if all(req <= 0 for req in combined_remaining):
-                possible_combinations.append(combined_fert)
+            # Filter out fertilizers with zero amount
+            filtered_combined_fert = {name: round(amount * farm_area, 3) for name, amount in combined_fert.items() if amount > 0}
+
+            if all(req <= 0 for req in combined_remaining) and filtered_combined_fert:
+                possible_combinations.append(filtered_combined_fert)
 
     return possible_combinations
+
+
 
 
 def calculate_fertilizer_amount(remaining, content):
