@@ -1,5 +1,5 @@
 from django.contrib import admin
-from app.models import Fertilizer, CropNutrientRequirement
+from app.models import Fertilizer, CropNutrientRequirement, Crop
 
 
 class FertilizerAdmin(admin.ModelAdmin):
@@ -14,7 +14,12 @@ class CropNutrientRequirementAdmin(admin.ModelAdmin):
     list_filter = ('crop_name',)
 
 
-# Register your models here.
+class CropAdmin(admin.ModelAdmin):
+    list_display = ('name', 'crop_type', 'highest_producer', 'highest_producing_country')
+    search_fields = ('name', 'crop_type', 'highest_producer', 'highest_producing_country')
+    list_filter = ('crop_type', 'highest_producing_country')
 
+
+admin.site.register(Crop, CropAdmin)
 admin.site.register(Fertilizer, FertilizerAdmin)
 admin.site.register(CropNutrientRequirement, CropNutrientRequirementAdmin)
