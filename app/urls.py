@@ -2,6 +2,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from app.views.crop_recommendation import CropRecommendationAPIView
 from app.views.fertilizer_combination import FertilizerCombinationAPIView
+from app.views.disease_prediction import DiseasePredictionView
 from app.views.model_viewsets import FertilizerViewSet, CropNutrientRequirementViewSet, CropViewSet
 from app.views.weather_insights import WeatherInsightsView
 
@@ -15,4 +16,5 @@ urlpatterns = [
     path('fertilizer-combinations/', FertilizerCombinationAPIView.as_view(), name='fertilizer-combinations'),
     path('crop-recommendation/', CropRecommendationAPIView.as_view(), name='crop-recommendation'),
     path('weather-insights', WeatherInsightsView.as_view(), name='weather-insights'),
+    path('predict-disease/', DiseasePredictionView.as_view(), name='predict-disease'),
 ]
