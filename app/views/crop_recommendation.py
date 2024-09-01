@@ -16,22 +16,30 @@ def crop_classifier():
 
 def weather_fetch(lat, long):
     """
-    Fetch and return the temperature and humidity of a location.
+    Fetch and return the temperature, humidity, and average rainfall of a location.
     :param long: longitude
     :param lat: latitude
-    :return: Tuple of (temperature, humidity) or None if there is an error
+    :return: Tuple of (temperature, humidity, avg_rainfall) or None if there is an error
     """
     api_key = os.getenv("OPENWEATHER_API_KEY")
     base_url = "https://api.openweathermap.org/data/3.0/onecall?"
-    complete_url = f"{base_url}lat={lat}&lon={long}&exclude=hourly,daily&appid={api_key}"
+    complete_url = f"{base_url}lat={lat}&lon={long}&exclude=minutely,current,hourly&appid={api_key}"
     try:
         response = requests.get(complete_url)
         response.raise_for_status()
         data = response.json()
-        main_data = data["current"]
-        temperature = round((main_data["temp"] - 273.15), 2)  # Convert from Kelvin to Celsius
-        humidity = main_data["humidity"]
-        return temperature, humidity
+
+        # Get current temperature and humidity from the first day's data
+        current_data = data["daily"][0]
+        temperature = round((current_data["temp"]["day"] - 273.15), 2)  # Convert from Kelvin to Celsius
+        humidity = current_data["humidity"]
+
+        # Calculate average rainfall for the next 7 days
+        rainfall_data = [day.get("rain", 0) for day in
+                         data["daily"][:7]]  # Get rain data for 7 days, default to 0 if no rain
+        avg_rainfall = round(mean(rainfall_data), 2)
+
+        return temperature, humidity, avg_rainfall
 
     except requests.exceptions.RequestException as e:
         print(f"Request failed: {e}")
@@ -48,14 +56,18 @@ class CropRecommendationAPIView(APIView):
         P = data.get('P')
         K = data.get('K')
         ph = data.get('ph')
-        rainfall = data.get('rainfall')
 
         weather_data = weather_fetch(lat, long)
         if weather_data:
-            temperature, humidity = weather_data
+            temperature, humidity, rainfall = weather_data
             feature_names = ['N', 'P', 'K', 'temperature', 'humidity', 'ph', 'rainfall']
             data = pd.DataFrame([[N, P, K, temperature, humidity, ph, rainfall]], columns=feature_names)
             prediction = crop_classifier().predict(data)
-            return Response({'prediction': prediction[0]}, status=status.HTTP_200_OK)
+            return Response({
+                'prediction': prediction[0],
+                'temperature': temperature,
+                'humidity': humidity,
+                'rainfall': rainfall
+            }, status=status.HTTP_200_OK)
         else:
             return Response({'error': 'Failed to fetch weather data'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
