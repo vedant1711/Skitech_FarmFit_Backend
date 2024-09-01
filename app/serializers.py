@@ -18,3 +18,11 @@ class CropSerializer(serializers.ModelSerializer):
     class Meta:
         model = Crop
         fields = '__all__'
+
+
+class WeatherDataSerializer(serializers.Serializer):
+    temperature = serializers.FloatField()
+    wind_speed = serializers.FloatField()
+    humidity = serializers.FloatField()
+    pressure = serializers.FloatField()
+

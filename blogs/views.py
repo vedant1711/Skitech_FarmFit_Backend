@@ -1,14 +1,14 @@
 # Create your views here.
+from django.db import transaction
+from rest_framework.authtoken.models import Token
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
 from blogs.models import BlogEntry, CustomUser
 from blogs.serializers import BlogEntrySerializer, CustomUserSerializer, SigninSerializer, SignupSerializer
 from rest_framework import viewsets, status
 from django.utils.text import slugify
 from rest_framework.exceptions import NotFound
-from rest_framework.authtoken.models import Token
 
 
 class CustomUserViewSet (viewsets.ModelViewSet):
@@ -84,8 +84,8 @@ class BlogEntryViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(blogs, many=True)
         return Response(serializer.data)
 
-
 class SignupView(APIView):
+    @transaction.atomic
     def post(self, request):
         serializer = SignupSerializer(data=request.data)
         if serializer.is_valid():
@@ -93,7 +93,6 @@ class SignupView(APIView):
             token, created = Token.objects.get_or_create(user=user)
             return Response({'token': token.key}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 class SigninView(APIView):
     def post(self, request):
