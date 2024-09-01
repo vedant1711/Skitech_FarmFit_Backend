@@ -70,3 +70,13 @@ class BlogEntryViewSet(viewsets.ModelViewSet):
             'meta_keywords': blog_entry.meta_keywords
         }
         return Response(data, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['get'], url_path='user/(?P<user_id>[^/.]+)')
+    def user_blogs(self, request, user_id=None):
+        """
+        Retrieve all blog posts of a specific user.
+        """
+        user = CustomUser.objects.get(id=user_id)
+        blogs = BlogEntry.objects.filter(user=user)
+        serializer = self.get_serializer(blogs, many=True)
+        return Response(serializer.data)
